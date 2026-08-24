@@ -2,12 +2,14 @@
 
 A lightweight, mobile-first web application designed for field agents to track sales leads, door knocks, and policy conversions offline without requiring server infrastructure or database hosting.
 
+Not Made by Me, I hosted!
+
 ---
 
 ## Key Features
 
 * **Offline-First Storage:** Data is stored directly in the device's local browser storage (`localStorage`) and cached using a Progressive Web App (PWA) Service Worker.
-* **Zero Backend Required:** Runs as a static single-page application directly from any host (e.g., GitHub Pages).
+* **Zero Backend Required:** Runs as a static single-page application directly from any host.
 * **Exporting & Sharing:** Generates structured summary reports ready to copy or share directly to WhatsApp.
 * **Persistent Configuration:** Remembers agent identity, daily zones, and team roster setup across sessions.
 
