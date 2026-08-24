@@ -1,0 +1,504 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amana Field Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --navy:#0A3D62; --navy-d:#062B45;
+    --teal:#0C7B93; --teal-l:#E3F1F5;
+    --gold:#F5A623; --gold-l:#FDF2DC; --gold-d:#8A5A00;
+    --green:#1E8E52; --green-l:#E4F5EB;
+    --red:#C0392B; --red-l:#FBEAE7;
+    --paper:#F2F6F9; --card:#fff;
+    --ink:#122937; --mid:#587184; --faint:#8AA1B1;
+    --line:#D9E3EA; --line-s:#EDF2F5;
+    --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
+button{cursor:pointer}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2{margin:0;font-weight:600;letter-spacing:-.01em}
+
+.wrap{max-width:700px;margin:0 auto;min-height:100vh;background:var(--paper);
+	display:flex;flex-direction:column;box-shadow:0 0 40px rgba(10,61,98,.07)}
+
+header{background:var(--navy-d);color:#fff;padding:14px 16px calc(14px + env(safe-area-inset-top));position:sticky;top:0;z-index:20}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.who{font-size:15px;font-weight:600;line-height:1.2}
+.who small{display:block;font-weight:400;font-size:11.5px;color:#9BBACD;margin-top:2px}
+.gear{background:rgba(255,255,255,.12);border:0;color:#fff;width:34px;height:34px;border-radius:9px;font-size:15px;flex:0 0 34px}
+.tally{display:flex;gap:8px;margin-top:12px}
+.tal{flex:1;background:rgba(255,255,255,.08);border-radius:9px;padding:8px 10px;text-align:center}
+.tal b{display:block;font-family:var(--mono);font-size:19px;font-weight:600;line-height:1.1}
+.tal span{font-size:10px;color:#9BBACD;letter-spacing:.05em;text-transform:uppercase}
+.tal.hit{background:var(--green)} .tal.hit span{color:#CDEEDB}
+
+main{flex:1;padding:16px 16px 92px}
+.screen{display:none} .screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:13px}
+.card h2{font-size:15px;margin-bottom:3px}
+.card .hint{font-size:12.5px;color:var(--mid);margin-bottom:13px}
+
+label.f{display:block;margin-bottom:13px}
+label.f>span{display:block;font-size:12px;font-weight:600;color:var(--mid);margin-bottom:6px}
+input[type=text],input[type=tel],input[type=number],select,textarea{
+	width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 13px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 3px rgba(12,123,147,.13)}
+textarea{resize:vertical;line-height:1.55}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:22px;padding:9px 14px;font-size:14px;font-weight:500;color:var(--mid)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.z[aria-pressed="true"]{background:var(--teal);border-color:var(--teal)}
+.chip.o[aria-pressed="true"]{background:var(--green);border-color:var(--green)}
+.chip.o.cb[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#3A2600}
+.chip.o.no[aria-pressed="true"]{background:var(--mid);border-color:var(--mid)}
+
+.btn{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:13px;font-size:15px;font-weight:600}
+.btn.p{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.g{background:var(--green);border-color:var(--green);color:#fff}
+.btn.t{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.sm{padding:9px;font-size:13.5px;width:auto}
+.btn:disabled{opacity:.4}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--red);font-weight:500}
+
+.counter{display:flex;align-items:center;gap:12px}
+.counter button{width:52px;height:52px;border-radius:13px;border:1.5px solid var(--line);background:#fff;font-size:24px;font-weight:600;color:var(--navy);flex:0 0 52px}
+.counter button:active{background:var(--teal-l)}
+.counter .v{flex:1;text-align:center;font-family:var(--mono);font-size:30px;font-weight:600}
+
+.item{border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:9px;background:#fff}
+.item .n{font-weight:600;font-size:14.5px}
+.item .m{font-size:12.5px;color:var(--mid);margin-top:3px}
+.item .b{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.tag.int{background:var(--green-l);color:var(--green)}
+.tag.cb{background:var(--gold-l);color:var(--gold-d)}
+.tag.no{background:var(--line-s);color:var(--mid)}
+.del{background:none;border:0;color:var(--red);font-size:13px;font-weight:500;padding:4px}
+
+.empty{text-align:center;padding:36px 14px;color:var(--mid);font-size:14px}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px}
+.note{background:var(--gold-l);border:1px solid #EBCE97;border-radius:11px;padding:12px 13px;font-size:13px;color:var(--gold-d);margin-bottom:13px}
+.note.info{background:var(--teal-l);border-color:#B9DCE5;color:#0A5A6B}
+.note.bad{background:var(--red-l);border-color:#EFC4BE;color:var(--red)}
+pre.out{background:#0B2233;color:#DCE9F0;border-radius:11px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.65;overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:0}
+
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fff;border-top:1px solid var(--line);
+	padding-bottom:env(safe-area-inset-bottom);max-width:700px;margin:0 auto}
+nav .in{display:flex}
+nav button{flex:1;border:0;background:none;padding:11px 4px 12px;font-size:11px;font-weight:600;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button .ic{font-size:19px;line-height:1}
+nav button[aria-current="true"]{color:var(--navy)}
+nav .badge{position:absolute;transform:translate(15px,-4px);background:var(--teal);color:#fff;border-radius:20px;
+	font-size:10px;font-weight:700;padding:1px 6px;font-family:var(--mono)}
+
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy);color:#fff;
+	padding:11px 20px;border-radius:9px;font-size:14px;font-weight:500;opacity:0;transition:.22s;z-index:60;max-width:88%;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.sk{height:12px;background:linear-gradient(90deg,#E4EBF0,#F1F5F8,#E4EBF0);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:5px;margin:9px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+	<header>
+		<div class="hrow">
+			<div class="who" id="who">Setting up…<small id="whoSub">—</small></div>
+			<button class="gear" id="gear" aria-label="Settings">⚙</button>
+		</div>
+		<div class="tally" id="tally"></div>
+	</header>
+
+	<main id="main"><div class="card"><div class="sk" style="width:60%"></div><div class="sk"></div><div class="sk" style="width:80%"></div></div></main>
+
+	<nav><div class="in">
+		<button data-s="add" aria-current="true"><span class="ic">＋</span>Add lead</button>
+		<button data-s="day"><span class="ic">☰</span>Today <span class="badge" id="bdg" hidden>0</span></button>
+		<button data-s="send"><span class="ic">➤</span>Send</button>
+	</div></nav>
+</div>
+<div id="toast"></div>
+
+<script>
+const ZONES=[
+ {id:'Z1',n:'Phase 1 Commercial'},{id:'Z2',n:'Phase 1 Residential'},
+ {id:'Z3',n:'Leisure & Beach'},{id:'Z4',n:'Phase 1/2 Border'},
+ {id:'Z5',n:'Hiyaa Precinct'},{id:'Z6',n:'Institutional'}];
+const PRODUCTS=['Motor Third Party','Motor Comprehensive','Renters / My Home','Travel Takaful',
+ 'Hajj & Umrah','Takaful Business Cover','Expatriate Takaful','Odi Booster','Health Takaful','Other'];
+const PREM={'Motor Third Party':175,'Motor Comprehensive':890,'Renters / My Home':200,'Travel Takaful':300,
+ 'Hajj & Umrah':359,'Takaful Business Cover':700,'Expatriate Takaful':1000,'Odi Booster':1500};
+const OUTCOME=[{id:'int',n:'Interested'},{id:'cb',n:'Call back'},{id:'no',n:'Not interested'}];
+const TARGET=4;
+const ROSTER=['Mohamed Jaish Junaid','Khadheeja Saara Mohamed','Aishath Shayan Waseem','Mohamed Aydin Moosa Khaleel','Aishath Aala Ibrahim','Ahmed Dhaavoodhu Ali'];
+
+const K={me:'aff_me',data:'aff_data'};
+let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',ready:false,dirty:false,
+			 draft:{product:'',outcome:'int'}};
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const today=()=>new Date().toISOString().slice(0,10);
+const pretty=d=>new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+let tt; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200);}
+
+function day(d){ return S.data[d||today()] ||= {zone:S.me.zone||'',place:'',partner:'',leads:[],sales:[],doors:0}; }
+function recentPlaces(){
+	const seen=[];
+	Object.keys(S.data).sort().reverse().forEach(k=>{
+		const p=(S.data[k].place||'').trim();
+		if(p && !seen.includes(p)) seen.push(p);
+	});
+	return seen.slice(0,6);
+}
+function roster(){ return (S.me.roster||[]).filter(Boolean); }
+function others(){ return roster().filter(n=>n!==S.me.name); }
+function parseRoster(txt){
+	return txt.replace(/^\s*TEAM\s*:/i,'')
+		.split(/[\n,]/).map(x=>x.trim()).filter(x=>x&&x.length<60);
+}
+
+function get(k,fb){
+	try{
+		const v=localStorage.getItem(k);
+		return v?JSON.parse(v):fb;
+	}catch(e){
+		return fb;
+	}
+}
+
+function save(){
+	try{
+		localStorage.setItem(K.data,JSON.stringify(S.data));
+		localStorage.setItem(K.me,JSON.stringify(S.me));
+		if(S.dirty){ S.dirty=false; render(); }
+		return true;
+	}catch(e){
+		if(!S.dirty){ S.dirty=true; render(); }
+		return false;
+	}
+}
+
+(function boot(){
+	const me=get(K.me,null);
+	const data=get(K.data,{});
+	S.me=Object.assign({name:'',zone:'Z5',roster:[]},me||{}); S.data=data||{};
+	if(!roster().length){ S.me.roster=ROSTER.slice(); }
+	else if(roster().length===ROSTER.length && !roster().every((n,x)=>n===ROSTER[x])){
+		S.me.roster=ROSTER.slice();
+		if(!ROSTER.includes(S.me.name)) S.me.name='';
+	}
+	S.ready=true;
+	if(!S.me.name||!roster().length) S.screen='setup';
+	bind(); render();
+})();
+
+function bind(){
+	document.querySelector('nav').addEventListener('click',e=>{
+		const b=e.target.closest('button[data-s]'); if(!b) return;
+		S.screen=b.dataset.s; render(); window.scrollTo({top:0});
+	});
+	$('#gear').addEventListener('click',()=>{ S.screen='setup'; render(); });
+}
+
+function render(){
+	if(!S.ready) return;
+	const d=day();
+	$('#who').innerHTML = S.me.name
+		? `${esc(S.me.name)}${d.partner?' &amp; '+esc(d.partner):''}<small>${d.partner?'Working together':'No partner set'} · ${pretty(today())}</small>`
+		: `Field form<small>Set up your name first</small>`;
+	const zn=ZONES.find(z=>z.id===d.zone);
+	$('#whoSub');
+	$('#tally').innerHTML = S.me.name ? [
+		['leads',d.leads.length+' / '+TARGET,'Leads today',d.leads.length>=TARGET],
+		['doors',d.doors,'Doors',false],
+		['sales',d.sales.length,'Sold',false],
+		['zone',d.place?d.place:(zn?zn.id:'—'),d.place?'Location':'Zone',false]
+	].map(t=>`<div class="tal ${t[3]?'hit':''}"><b>${esc(t[1])}</b><span>${t[2]}</span></div>`).join('') : '';
+
+	document.querySelectorAll('nav button[data-s]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.s===S.screen)));
+	const bd=$('#bdg'); bd.hidden=!d.leads.length; bd.textContent=d.leads.length;
+
+	const v=S.screen;
+	$('#main').innerHTML = v==='setup'?scSetup(): v==='add'?scAdd(): v==='day'?scDay(): scSend();
+	wire();
+}
+
+function scSetup(){
+	return `
+	${S.dirty?`<div class="note bad"><b>Not saved yet.</b> Storage limits or settings may be preventing saves.</div>`:''}
+	<div class="card">
+		<h2>1. The team list</h2>
+		<div class="hint">Already loaded. Only change this if your supervisor sends a new list.</div>
+		<label class="f"><span>Everyone on the campaign</span>
+			<textarea id="rIn" rows="4" placeholder="TEAM: Ahmed Rasheed, Fathimath Nasr, Ibrahim Shah…">${esc(roster().join('\n'))}</textarea></label>
+		<button class="btn" id="rSave">Save the team list</button>
+		${roster().length?`<div class="hint" style="margin:11px 0 0">${roster().length} names saved.</div>`:''}
+	</div>
+
+	${roster().length?`<div class="card">
+		<h2>2. Which one are you?</h2>
+		<div class="hint">Tap your name. Set this once — it goes on every list you send.</div>
+		<div class="chips">${roster().map(n=>`<button class="chip mName" data-v="${esc(n)}" aria-pressed="${S.me.name===n}">${esc(n)}</button>`).join('')}</div>
+	</div>`:''}
+	<div class="card">
+		<h2>How this works</h2>
+		<div class="hint" style="margin:0">
+			Add each person you speak to as you go — it saves on your phone straight away.
+			When you get back to the office, open <b>Send</b> and share the day's list with your supervisor on WhatsApp.
+			He pastes it into the campaign system.
+		</div>
+	</div>
+	${(Object.keys(S.data).length || S.me.name) ?`<button class="btn ghost" id="wipe">Clear everything on this phone</button>`:''}`;
+}
+
+function scAdd(){
+	if(!S.me.name) return `<div class="note">Set your name first — tap the ⚙ button at the top.</div>`;
+	const d=day();
+	const locLabel = d.place || d.zone || 'today\u2019s location';
+	return `
+	${S.dirty?`<div class="note bad"><b>Not saved yet.</b> Keeping changes in memory temporarily.</div>`:''}
+	<div class="card">
+		<h2>Today's setup</h2>
+		<div class="hint">Pairs change, so set both of these when you arrive.</div>
+		<label class="f"><span>Who are you working with today?</span>
+			<div class="chips">${others().length
+				? others().map(n=>`<button class="chip ptBtn" data-v="${esc(n)}" aria-pressed="${d.partner===n}">${esc(n)}</button>`).join('')
+					+`<button class="chip ptBtn" data-v="" aria-pressed="${!d.partner}">On my own</button>`
+				: '<span style="font-size:13px;color:var(--mid)">Add the team list in settings first.</span>'}</div></label>
+		<label class="f"><span>Zone</span>
+			<div class="chips">${ZONES.map(z=>`<button class="chip z zBtn" data-v="${z.id}" aria-pressed="${d.zone===z.id}">${z.id} ${esc(z.n)}</button>`).join('')}</div></label>
+		<label class="f" style="margin:0"><span>Exactly where are you? <span style="font-weight:400;color:var(--faint)">— type it yourself</span></span>
+			<input type="text" id="plIn" value="${esc(d.place||'')}" placeholder="e.g. Vinares Tower 3 lobby" autocomplete="off">
+			${recentPlaces().length?`<div class="chips" style="margin-top:9px">${recentPlaces().map(p=>
+				`<button class="chip plBtn" data-v="${esc(p)}" aria-pressed="${d.place===p}">${esc(p)}</button>`).join('')}</div>`:''}
+		</label>
+	</div>
+
+	<div class="card">
+		<h2>Add someone you spoke to</h2>
+		<div class="hint">Name and number are the ones that matter.</div>
+		<label class="f"><span>Name</span>
+			<input type="text" id="lName" placeholder="Customer name" autocomplete="off"></label>
+		<label class="f"><span>Mobile number</span>
+			<input type="tel" id="lPhone" inputmode="numeric" placeholder="7XXXXXX" autocomplete="off"></label>
+		<label class="f"><span>What were they interested in?</span>
+			<div class="chips">${PRODUCTS.map(p=>`<button class="chip pBtn" data-v="${esc(p)}" aria-pressed="${S.draft.product===p}">${esc(p)}</button>`).join('')}</div></label>
+		<label class="f"><span>How did it go?</span>
+			<div class="chips">${OUTCOME.map(o=>`<button class="chip o ${o.id} oBtn" data-v="${o.id}" aria-pressed="${S.draft.outcome===o.id}">${o.n}</button>`).join('')}</div></label>
+		<label class="f"><span>Where did you meet them? <span style="font-weight:400;color:var(--faint)">— leave blank to use ${esc(locLabel)}</span></span>
+			<input type="text" id="lPlace" placeholder="Only if it was somewhere else" autocomplete="off"></label>
+		<label class="f"><span>Note (optional)</span>
+			<input type="text" id="lNote" placeholder="e.g. call after 5"></label>
+		<button class="btn p" id="lAdd">Add to today's list</button>
+	</div>
+
+	<div class="card">
+		<h2>Doors knocked</h2>
+		<div class="hint">Count every door, including no answer.</div>
+		<div class="counter">
+			<button id="dMinus" aria-label="One fewer">−</button>
+			<div class="v" id="dVal">${d.doors}</div>
+			<button id="dPlus" aria-label="One more">＋</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Sold something?</h2>
+		<div class="hint">Log it here so it goes in with your list.</div>
+		<label class="f"><span>Customer</span><input type="text" id="sCust" placeholder="Name on the policy"></label>
+		<label class="f"><span>Product</span>
+			<select id="sProd">${PRODUCTS.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('')}</select></label>
+		<label class="f"><span>Premium (MVR)</span><input type="number" id="sPrem" inputmode="numeric" value="175"></label>
+		<button class="btn g" id="sAdd">Log the sale</button>
+	</div>`;
+}
+
+function scDay(){
+	const d=day();
+	return `
+	<div class="card">
+		<h2>${pretty(today())}</h2>
+		<div class="hint" style="margin:0">${d.partner?'With '+esc(d.partner):'On your own'} · ${esc(d.place||'')}${d.place?' ':''}(zone ${esc(d.zone||'—')})<br>
+			${d.leads.length} ${d.leads.length===1?'lead':'leads'} · ${d.doors} doors · ${d.sales.length} sold</div>
+	</div>
+	${d.sales.length?`<div class="card"><h2>Sold today</h2><div class="hint">Nice work.</div>
+		${d.sales.map(s=>`<div class="item"><div class="n">${esc(s.customer)}</div>
+			<div class="m">${esc(s.product)} · MVR ${Number(s.premium||0).toLocaleString()}</div>
+			<div class="b"><span></span><button class="del delSale" data-id="${s.id}">Remove</button></div></div>`).join('')}
+	</div>`:''}
+	${d.leads.length? `<div class="card"><h2>People you spoke to</h2><div class="hint">Newest first.</div>
+		${d.leads.slice().reverse().map(l=>`<div class="item">
+			<div class="n">${esc(l.name)}</div>
+			<div class="m">${esc(l.phone||'no number')}${l.product?' · '+esc(l.product):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
+			<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span>
+				<button class="del delLead" data-id="${l.id}">Remove</button></div></div>`).join('')}
+	</div>`
+	: `<div class="empty"><b>Nothing logged yet today</b>Tap “Add lead” at the bottom after your first conversation.</div>`}
+	${prevDays()}`;
+}
+
+function prevDays(){
+	const ds=Object.keys(S.data).filter(d=>d!==today()&&(S.data[d].leads.length||S.data[d].sales.length)).sort().reverse();
+	if(!ds.length) return '';
+	return `<div class="card"><h2>Earlier days</h2>
+		<div class="hint">Still on your phone if you need to resend one.</div>
+		${ds.slice(0,10).map(d=>`<div class="item"><div class="n">${pretty(d)}</div>
+			<div class="m">${S.data[d].leads.length} leads · ${S.data[d].doors} doors · ${S.data[d].sales.length} sold</div>
+			<div class="b"><span></span><button class="btn sm resend" data-d="${d}">Send this day</button></div></div>`).join('')}
+	</div>`;
+}
+
+function scSend(){
+	const d=S.sendDate||today();
+	const txt=buildText(d);
+	const has=S.data[d]&&(S.data[d].leads.length||S.data[d].sales.length);
+	return `
+	<div class="card">
+		<h2>Send to your supervisor</h2>
+		<div class="hint">Share this on WhatsApp when you get back to the office. He pastes it straight into the system.</div>
+		${has? `<button class="btn t" id="share" style="margin-bottom:9px">Share on WhatsApp</button>
+						<button class="btn" id="copy">Copy the text</button>`
+				 : `<div class="note">Nothing logged for this day yet.</div>`}
+	</div>
+	${has?`<div class="card"><h2>What will be sent</h2><div class="hint">Check the names and numbers are right.</div>
+		<pre class="out">${esc(txt)}</pre></div>`:''}
+	${S.sendDate&&S.sendDate!==today()?`<button class="btn" id="backToday">Back to today</button>`:''}
+	<div class="note info" style="margin-top:13px">
+		Keep the list on your phone until your supervisor confirms he has it. Don't clear anything before then.
+	</div>`;
+}
+
+function buildText(dt){
+	const d=S.data[dt]; if(!d) return '';
+	const L=[];
+	L.push(`Daily leads — ${S.me.name||'?'}${d.partner?' with '+d.partner:' (on my own)'} — ${dt}`);
+	L.push(`Zone: ${d.zone||'not set'}`);
+	if(d.place) L.push(`Location: ${d.place}`);
+	L.push('');
+	d.leads.forEach(l=>{
+		const where=(l.place&&l.place!==d.place)?('@ '+l.place):'';
+		const note=[where,l.note,OUTCOME.find(o=>o.id===l.outcome)?.n].filter(Boolean).join(' — ');
+		L.push([l.name,l.phone,l.product,note].filter(Boolean).join(', '));
+	});
+	if(!d.leads.length) L.push('(no leads today)');
+	L.push('');
+	L.push(`Doors knocked: ${d.doors}`);
+	d.sales.forEach(s=>L.push(`Policy sold: ${s.customer} — ${s.product} — MVR ${s.premium}`));
+	return L.join('\n');
+}
+
+function wire(){
+	const on=(s,e,f)=>{const el=$(s); if(el) el.addEventListener(e,f);};
+	const all=(s,e,f)=>document.querySelectorAll(s).forEach(el=>el.addEventListener(e,f));
+
+	on('#rSave','click',()=>{
+		const list=parseRoster($('#rIn').value);
+		if(!list.length){ toast('Add at least one name'); return; }
+		S.me.roster=list;
+		if(S.me.name && !list.includes(S.me.name)) S.me.name='';
+		save(); toast(list.length+' names saved'); render();
+	});
+	all('.mName','click',e=>{
+		S.me.name=e.currentTarget.dataset.v; save();
+		toast('You are '+S.me.name); S.screen='add'; render();
+	});
+	all('.ptBtn','click',e=>{
+		day().partner=e.currentTarget.dataset.v; save(); render();
+	});
+	on('#plIn','change',e=>{ day().place=e.target.value.trim(); save(); render(); });
+	on('#plIn','blur',e=>{ day().place=e.target.value.trim(); save(); });
+	all('.plBtn','click',e=>{
+		const v=e.currentTarget.dataset.v;
+		day().place = (day().place===v) ? '' : v;
+		save(); render();
+	});
+	on('#wipe','click',()=>{
+		if(!confirm('Delete every lead and reset all settings on this phone?')) return;
+		localStorage.clear();
+		location.reload();
+	});
+
+	all('.zBtn','click',e=>{ const d=day(); d.zone=e.currentTarget.dataset.v; S.me.zone=d.zone; save(); render(); });
+	all('.pBtn','click',e=>{ S.draft.product=e.currentTarget.dataset.v;
+		document.querySelectorAll('.pBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.product))); });
+	all('.oBtn','click',e=>{ S.draft.outcome=e.currentTarget.dataset.v;
+		document.querySelectorAll('.oBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.outcome))); });
+
+	on('#lAdd','click',()=>{
+		const name=$('#lName').value.trim();
+		if(!name){ toast('Add a name'); $('#lName').focus(); return; }
+		const d=day();
+		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),product:S.draft.product,
+			outcome:S.draft.outcome,place:$('#lPlace').value.trim(),note:$('#lNote').value.trim(),ts:Date.now()});
+		S.draft={product:'',outcome:'int'};
+		save();
+		toast(`Added — ${d.leads.length} today`);
+		render(); window.scrollTo({top:0,behavior:'smooth'});
+	});
+
+	const bump=n=>{ const d=day(); d.doors=Math.max(0,(d.doors||0)+n);
+		const v=$('#dVal'); if(v) v.textContent=d.doors;
+		const t=document.querySelector('#tally .tal:nth-child(2) b'); if(t) t.textContent=d.doors;
+		save(); };
+	on('#dPlus','click',()=>bump(1));
+	on('#dMinus','click',()=>bump(-1));
+
+	on('#sProd','change',e=>{ const p=PREM[e.target.value]; if(p) $('#sPrem').value=p; });
+	on('#sAdd','click',()=>{
+		const c=$('#sCust').value.trim();
+		if(!c){ toast('Add the customer name'); $('#sCust').focus(); return; }
+		day().sales.push({id:uid(),customer:c,product:$('#sProd').value,premium:+$('#sPrem').value||0,ts:Date.now()});
+		save(); toast('Sale logged'); render();
+	});
+
+	all('.delLead','click',e=>{ const d=day();
+		d.leads=d.leads.filter(l=>l.id!==e.currentTarget.dataset.id); save(); toast('Removed'); render(); });
+	all('.delSale','click',e=>{ const d=day();
+		d.sales=d.sales.filter(s=>s.id!==e.currentTarget.dataset.id); save(); toast('Removed'); render(); });
+
+	all('.resend','click',e=>{ S.sendDate=e.currentTarget.dataset.d; S.screen='send'; render(); });
+	on('#backToday','click',()=>{ S.sendDate=null; render(); });
+	on('#copy','click',()=>doCopy(buildText(S.sendDate||today())));
+	on('#share','click',async()=>{
+		const t=buildText(S.sendDate||today());
+		if(navigator.share){
+			try{ await navigator.share({text:t}); return; }catch(_){ }
+		}
+		window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+	});
+}
+
+async function doCopy(t){
+	try{ await navigator.clipboard.writeText(t); toast('Copied — paste it in WhatsApp'); }
+	catch(_){ const ta=document.createElement('textarea'); ta.value=t;
+		ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+		ta.select(); document.execCommand('copy'); ta.remove(); toast('Copied — paste it in WhatsApp'); }
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swCode = `
+      const CACHE_NAME = 'field-form-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  });
+}
+</script>
