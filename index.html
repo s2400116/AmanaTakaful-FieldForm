@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Amana Field Form</title>
@@ -19,7 +22,7 @@
     --mono:'IBM Plex Mono',ui-monospace,monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;user-select: none;}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 button{cursor:pointer}
@@ -35,7 +38,7 @@ header{background:var(--navy-d);color:#fff;padding:14px 16px calc(14px + env(saf
 .who small{display:block;font-weight:400;font-size:11.5px;color:#9BBACD;margin-top:2px}
 .gear{background:rgba(255,255,255,.12);border:0;color:#fff;width:34px;height:34px;border-radius:9px;font-size:15px;flex:0 0 34px}
 .tally{display:flex;gap:8px;margin-top:12px}
-.tal{flex:1;background:rgba(255,255,255,.08);border-radius:9px;padding:8px 10px;text-align:center}
+.tal{flex:1;background:rgba(255,255,255,.08);border-radius:9px;padding:8px 10px;text-align:center;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:3px}
 .tal b{display:block;font-family:var(--mono);font-size:19px;font-weight:600;line-height:1.1}
 .tal span{font-size:10px;color:#9BBACD;letter-spacing:.05em;text-transform:uppercase}
 .tal.hit{background:var(--green)} .tal.hit span{color:#CDEEDB}
@@ -45,6 +48,7 @@ main{flex:1;padding:16px 16px 92px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:13px}
 .card h2{font-size:15px;margin-bottom:3px}
 .card .hint{font-size:12.5px;color:var(--mid);margin-bottom:13px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start}
 
 label.f{display:block;margin-bottom:13px}
 label.f>span{display:block;font-size:12px;font-weight:600;color:var(--mid);margin-bottom:6px}
@@ -65,7 +69,8 @@ textarea{resize:vertical;line-height:1.55}
 .btn.p{background:var(--navy);border-color:var(--navy);color:#fff}
 .btn.g{background:var(--green);border-color:var(--green);color:#fff}
 .btn.t{background:var(--teal);border-color:var(--teal);color:#fff}
-.btn.sm{padding:9px;font-size:13.5px;width:auto}
+.btn.sm{padding:7px 12px;font-size:13px;width:auto}
+.btn.danger{background:var(--red-l);border-color:#EFC4BE;color:var(--red)}
 .btn:disabled{opacity:.4}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--red);font-weight:500}
 
@@ -89,8 +94,9 @@ textarea{resize:vertical;line-height:1.55}
 .note{background:var(--gold-l);border:1px solid #EBCE97;border-radius:11px;padding:12px 13px;font-size:13px;color:var(--gold-d);margin-bottom:13px}
 .note.info{background:var(--teal-l);border-color:#B9DCE5;color:#0A5A6B}
 .note.bad{background:var(--red-l);border-color:#EFC4BE;color:var(--red)}
-pre.out{background:#0B2233;color:#DCE9F0;border-radius:11px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.65;overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:0}
+pre.out{user-select:all;background:#0B2233;color:#DCE9F0;border-radius:11px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.65;overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:0}
 
+/* bottom nav */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fff;border-top:1px solid var(--line);
 	padding-bottom:env(safe-area-inset-bottom);max-width:700px;margin:0 auto}
 nav .in{display:flex}
@@ -100,13 +106,15 @@ nav button[aria-current="true"]{color:var(--navy)}
 nav .badge{position:absolute;transform:translate(15px,-4px);background:var(--teal);color:#fff;border-radius:20px;
 	font-size:10px;font-weight:700;padding:1px 6px;font-family:var(--mono)}
 
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy);color:#fff;
-	padding:11px 20px;border-radius:9px;font-size:14px;font-weight:500;opacity:0;transition:.22s;z-index:60;max-width:88%;text-align:center}
-#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast{z-index: 1;position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy);color:#fff;
+	padding:11px 20px;border-radius:9px;font-size:14px;font-weight:500;opacity:0;transition:.22s;max-width:88%;text-align:center}
+#toast.on{z-index:30;opacity:1;transform:translateX(-50%) translateY(0)}
 .sk{height:12px;background:linear-gradient(90deg,#E4EBF0,#F1F5F8,#E4EBF0);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:5px;margin:9px 0}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+</head>
+<body>
 
 <div class="wrap">
 	<header>
@@ -141,7 +149,7 @@ const TARGET=4;
 const ROSTER=['Mohamed Jaish Junaid','Khadheeja Saara Mohamed','Aishath Shayan Waseem','Mohamed Aydin Moosa Khaleel','Aishath Aala Ibrahim','Ahmed Dhaavoodhu Ali'];
 
 const K={me:'aff_me',data:'aff_data'};
-let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',ready:false,dirty:false,
+let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',historyDate:null,ready:false,dirty:false,
 			 draft:{product:'',outcome:'int'}};
 
 const $=s=>document.querySelector(s);
@@ -151,12 +159,29 @@ const today=()=>new Date().toISOString().slice(0,10);
 const pretty=d=>new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 let tt; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200);}
 
-function day(d){ return S.data[d||today()] ||= {zone:S.me.zone||'',place:'',partner:'',leads:[],sales:[],doors:0}; }
+function getPartners(d){
+	if(Array.isArray(d.partners)) return d.partners;
+	if(d.partner) return [d.partner];
+	return [];
+}
+
+function day(d){ return S.data[d||today()] ||= {zone:S.me.zone||'',place:'',partners:[],leads:[],sales:[],doors:0}; }
 function recentPlaces(){
 	const seen=[];
 	Object.keys(S.data).sort().reverse().forEach(k=>{
 		const p=(S.data[k].place||'').trim();
 		if(p && !seen.includes(p)) seen.push(p);
+	});
+	return seen.slice(0,6);
+}
+function recentNames(){
+	const seen=[];
+	Object.keys(S.data).sort().reverse().forEach(k=>{
+		const leads=S.data[k].leads||[];
+		leads.slice().reverse().forEach(l=>{
+			const n=(l.name||'').trim();
+			if(n && !seen.includes(n)) seen.push(n);
+		});
 	});
 	return seen.slice(0,6);
 }
@@ -213,11 +238,23 @@ function bind(){
 function render(){
 	if(!S.ready) return;
 	const d=day();
+	const pts=getPartners(d);
+	
+	let headerTitle=esc(S.me.name);
+	let headerSub='Working solo';
+	if(pts.length===1){
+		headerTitle=`${esc(S.me.name)} &amp; ${esc(pts[0])}`;
+		headerSub='Working in duos';
+	}else if(pts.length>=2){
+		headerTitle=`${esc(S.me.name)}, ${esc(pts[0])} &amp; ${esc(pts[1])}`;
+		headerSub='Working in trios';
+	}
+
 	$('#who').innerHTML = S.me.name
-		? `${esc(S.me.name)}${d.partner?' &amp; '+esc(d.partner):''}<small>${d.partner?'Working together':'No partner set'} · ${pretty(today())}</small>`
+		? `${headerTitle}<small>${headerSub} · ${pretty(today())}</small>`
 		: `Field form<small>Set up your name first</small>`;
+
 	const zn=ZONES.find(z=>z.id===d.zone);
-	$('#whoSub');
 	$('#tally').innerHTML = S.me.name ? [
 		['leads',d.leads.length+' / '+TARGET,'Leads today',d.leads.length>=TARGET],
 		['doors',d.doors,'Doors',false],
@@ -225,11 +262,11 @@ function render(){
 		['zone',d.place?d.place:(zn?zn.id:'—'),d.place?'Location':'Zone',false]
 	].map(t=>`<div class="tal ${t[3]?'hit':''}"><b>${esc(t[1])}</b><span>${t[2]}</span></div>`).join('') : '';
 
-	document.querySelectorAll('nav button[data-s]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.s===S.screen)));
+	document.querySelectorAll('nav button[data-s]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.s===S.screen && S.screen!=='history')));
 	const bd=$('#bdg'); bd.hidden=!d.leads.length; bd.textContent=d.leads.length;
 
 	const v=S.screen;
-	$('#main').innerHTML = v==='setup'?scSetup(): v==='add'?scAdd(): v==='day'?scDay(): scSend();
+	$('#main').innerHTML = v==='setup'?scSetup(): v==='add'?scAdd(): v==='day'?scDay(): v==='history'?scHistory(): scSend();
 	wire();
 }
 
@@ -261,19 +298,21 @@ function scSetup(){
 	${(Object.keys(S.data).length || S.me.name) ?`<button class="btn ghost" id="wipe">Clear everything on this phone</button>`:''}`;
 }
 
+/* ---------- add lead ---------- */
 function scAdd(){
 	if(!S.me.name) return `<div class="note">Set your name first — tap the ⚙ button at the top.</div>`;
 	const d=day();
+	const pts=getPartners(d);
 	const locLabel = d.place || d.zone || 'today\u2019s location';
 	return `
 	${S.dirty?`<div class="note bad"><b>Not saved yet.</b> Keeping changes in memory temporarily.</div>`:''}
 	<div class="card">
 		<h2>Today's setup</h2>
-		<div class="hint">Pairs change, so set both of these when you arrive.</div>
+		<div class="hint">Select up to 2 partners for trios when you arrive.</div>
 		<label class="f"><span>Who are you working with today?</span>
 			<div class="chips">${others().length
-				? others().map(n=>`<button class="chip ptBtn" data-v="${esc(n)}" aria-pressed="${d.partner===n}">${esc(n)}</button>`).join('')
-					+`<button class="chip ptBtn" data-v="" aria-pressed="${!d.partner}">On my own</button>`
+				? others().map(n=>`<button class="chip ptBtn" data-v="${esc(n)}" aria-pressed="${pts.includes(n)}">${esc(n)}</button>`).join('')
+					+`<button class="chip ptBtn" data-v="" aria-pressed="${pts.length===0}">On my own</button>`
 				: '<span style="font-size:13px;color:var(--mid)">Add the team list in settings first.</span>'}</div></label>
 		<label class="f"><span>Zone</span>
 			<div class="chips">${ZONES.map(z=>`<button class="chip z zBtn" data-v="${z.id}" aria-pressed="${d.zone===z.id}">${z.id} ${esc(z.n)}</button>`).join('')}</div></label>
@@ -288,7 +327,10 @@ function scAdd(){
 		<h2>Add someone you spoke to</h2>
 		<div class="hint">Name and number are the ones that matter.</div>
 		<label class="f"><span>Name</span>
-			<input type="text" id="lName" placeholder="Customer name" autocomplete="off"></label>
+			<input type="text" id="lName" placeholder="Customer name or house name" autocomplete="off">
+			${recentNames().length?`<div class="chips" style="margin-top:9px">${recentNames().map(n=>
+				`<button class="chip lNameBtn" data-v="${esc(n)}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>`:''}
+		</label>
 		<label class="f"><span>Mobile number</span>
 			<input type="tel" id="lPhone" inputmode="numeric" placeholder="7XXXXXX" autocomplete="off"></label>
 		<label class="f"><span>What were they interested in?</span>
@@ -325,13 +367,24 @@ function scAdd(){
 
 function scDay(){
 	const d=day();
+	const pts=getPartners(d);
+	let partnerStr = 'On your own';
+	if(pts.length===1) partnerStr = 'With '+esc(pts[0]);
+	if(pts.length>=2) partnerStr = 'Trio with '+esc(pts[0])+' & '+esc(pts[1]);
+
+	const hasPastDays = Object.keys(S.data).some(k => k !== today() && (S.data[k].leads.length || S.data[k].sales.length));
 	return `
 	<div class="card">
-		<h2>${pretty(today())}</h2>
-		<div class="hint" style="margin:0">${d.partner?'With '+esc(d.partner):'On your own'} · ${esc(d.place||'')}${d.place?' ':''}(zone ${esc(d.zone||'—')})<br>
-			${d.leads.length} ${d.leads.length===1?'lead':'leads'} · ${d.doors} doors · ${d.sales.length} sold</div>
+		<div class="card-head">
+			<div>
+				<h2>${pretty(today())}</h2>
+				<div class="hint" style="margin:0">${partnerStr} · ${esc(d.place||'')}${d.place?' ':''}(zone ${esc(d.zone||'—')})<br>
+					${d.leads.length} ${d.leads.length===1?'lead':'leads'} · ${d.doors} doors · ${d.sales.length} sold</div>
+			</div>
+			${hasPastDays ? `<button class="btn sm" id="openHistoryBtn">History</button>` : ''}
+		</div>
 	</div>
-	${d.sales.length?`<div class="card"><h2>Sold today</h2><div class="hint">Nice work.</div>
+	${d.sales.length?`<div class="card">数<h2>Sold today</h2><div class="hint">Nice work.</div>
 		${d.sales.map(s=>`<div class="item"><div class="n">${esc(s.customer)}</div>
 			<div class="m">${esc(s.product)} · MVR ${Number(s.premium||0).toLocaleString()}</div>
 			<div class="b"><span></span><button class="del delSale" data-id="${s.id}">Remove</button></div></div>`).join('')}
@@ -351,13 +404,62 @@ function prevDays(){
 	const ds=Object.keys(S.data).filter(d=>d!==today()&&(S.data[d].leads.length||S.data[d].sales.length)).sort().reverse();
 	if(!ds.length) return '';
 	return `<div class="card"><h2>Earlier days</h2>
-		<div class="hint">Still on your phone if you need to resend one.</div>
+		<div class="hint">Still on your phone if you need to resend or review one.</div>
 		${ds.slice(0,10).map(d=>`<div class="item"><div class="n">${pretty(d)}</div>
 			<div class="m">${S.data[d].leads.length} leads · ${S.data[d].doors} doors · ${S.data[d].sales.length} sold</div>
-			<div class="b"><span></span><button class="btn sm resend" data-d="${d}">Send this day</button></div></div>`).join('')}
+			<div class="b"><span></span><button class="btn sm openHistoryDate" data-d="${d}">View History</button></div></div>`).join('')}
 	</div>`;
 }
 
+function scHistory(){
+	const dt = S.historyDate || Object.keys(S.data).filter(k=>k!==today()).sort().reverse()[0];
+	if (!dt || !S.data[dt]) {
+		return `<div class="card"><h2>No History Available</h2><div class="hint">There are no logs recorded for previous days.</div>
+		<button class="btn" id="histBack">Back to Today</button></div>`;
+	}
+	const d = S.data[dt];
+	const pts = getPartners(d);
+	let partnerStr = 'On their own';
+	if(pts.length===1) partnerStr = 'With '+esc(pts[0]);
+	if(pts.length>=2) partnerStr = 'Trio with '+esc(pts[0])+' & '+esc(pts[1]);
+
+	const txt = buildText(dt);
+	return `
+	<div class="card">
+		<div class="card-head">
+			<div>
+				<h2>History: ${pretty(dt)}</h2>
+				<div class="hint" style="margin:0">${partnerStr} · ${esc(d.place||'')}${d.place?' ':''}(zone ${esc(d.zone||'—')})<br>
+					${d.leads.length} leads · ${d.doors} doors · ${d.sales.length} sold</div>
+			</div>
+			<button class="btn sm" id="histBack">Back</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Actions</h2>
+		<div class="chips" style="gap:9px">
+			<button class="btn t" id="hShare">Export to WhatsApp</button>
+			<button class="btn" id="hCopy">Copy Text</button>
+			<button class="btn danger" id="hDelete">Delete Entry</button>
+		</div>
+	</div>
+
+	${d.leads.length ? `<div class="card"><h2>Leads Logged</h2>
+		${d.leads.slice().reverse().map(l=>`<div class="item">
+			<div class="n">${esc(l.name)}</div>
+			<div class="m">${esc(l.phone||'no number')}${l.product?' · '+esc(l.product):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
+			<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span></div>
+		</div>`).join('')}
+	</div>` : ''}
+
+	<div class="card">
+		<h2>Summary Text</h2>
+		<pre class="out">${esc(txt)}</pre>
+	</div>`;
+}
+
+/* ---------- send ---------- */
 function scSend(){
 	const d=S.sendDate||today();
 	const txt=buildText(d);
@@ -373,15 +475,20 @@ function scSend(){
 	${has?`<div class="card"><h2>What will be sent</h2><div class="hint">Check the names and numbers are right.</div>
 		<pre class="out">${esc(txt)}</pre></div>`:''}
 	${S.sendDate&&S.sendDate!==today()?`<button class="btn" id="backToday">Back to today</button>`:''}
-	<div class="note info" style="margin-top:13px">
-		Keep the list on your phone until your supervisor confirms he has it. Don't clear anything before then.
-	</div>`;
+	<div class="note info" style="margin-top:13pxflex:1justify-content:center;align-items:center;text-align:center">
+    	Be sure to send your supervisor the list before clocking out..
+  	</div>`
 }
 
 function buildText(dt){
 	const d=S.data[dt]; if(!d) return '';
+	const pts=getPartners(d);
+	let partnerText='(on my own)';
+	if(pts.length===1) partnerText=`with ${pts[0]}`;
+	else if(pts.length>=2) partnerText=`with ${pts[0]} and ${pts[1]}`;
+
 	const L=[];
-	L.push(`Daily leads — ${S.me.name||'?'}${d.partner?' with '+d.partner:' (on my own)'} — ${dt}`);
+	L.push(`Daily leads — ${S.me.name||'?'}${partnerText?' '+partnerText:''} — ${dt}`);
 	L.push(`Zone: ${d.zone||'not set'}`);
 	if(d.place) L.push(`Location: ${d.place}`);
 	L.push('');
@@ -397,10 +504,12 @@ function buildText(dt){
 	return L.join('\n');
 }
 
+/* ---------- wiring ---------- */
 function wire(){
 	const on=(s,e,f)=>{const el=$(s); if(el) el.addEventListener(e,f);};
 	const all=(s,e,f)=>document.querySelectorAll(s).forEach(el=>el.addEventListener(e,f));
 
+	// setup
 	on('#rSave','click',()=>{
 		const list=parseRoster($('#rIn').value);
 		if(!list.length){ toast('Add at least one name'); return; }
@@ -413,7 +522,24 @@ function wire(){
 		toast('You are '+S.me.name); S.screen='add'; render();
 	});
 	all('.ptBtn','click',e=>{
-		day().partner=e.currentTarget.dataset.v; save(); render();
+		const d=day();
+		const v=e.currentTarget.dataset.v;
+		let pts=getPartners(d);
+		if(!v){
+			d.partners=[];
+		} else {
+			if(pts.includes(v)){
+				pts=pts.filter(x=>x!==v);
+			} else if(pts.length<2){
+				pts.push(v);
+			} else {
+				toast('Max 2 partners (3 people total)');
+				return;
+			}
+			d.partners=pts;
+		}
+		delete d.partner;
+		save(); render();
 	});
 	on('#plIn','change',e=>{ day().place=e.target.value.trim(); save(); render(); });
 	on('#plIn','blur',e=>{ day().place=e.target.value.trim(); save(); });
@@ -422,18 +548,25 @@ function wire(){
 		day().place = (day().place===v) ? '' : v;
 		save(); render();
 	});
+	all('.lNameBtn','click',e=>{
+		const v=e.currentTarget.dataset.v;
+		const el=$('#lName');
+		if(el) el.value=v;
+	});
 	on('#wipe','click',()=>{
 		if(!confirm('Delete every lead and reset all settings on this phone?')) return;
 		localStorage.clear();
 		location.reload();
 	});
 
+	// zone + draft chips
 	all('.zBtn','click',e=>{ const d=day(); d.zone=e.currentTarget.dataset.v; S.me.zone=d.zone; save(); render(); });
 	all('.pBtn','click',e=>{ S.draft.product=e.currentTarget.dataset.v;
 		document.querySelectorAll('.pBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.product))); });
 	all('.oBtn','click',e=>{ S.draft.outcome=e.currentTarget.dataset.v;
 		document.querySelectorAll('.oBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.outcome))); });
 
+	// add lead
 	on('#lAdd','click',()=>{
 		const name=$('#lName').value.trim();
 		if(!name){ toast('Add a name'); $('#lName').focus(); return; }
@@ -446,6 +579,7 @@ function wire(){
 		render(); window.scrollTo({top:0,behavior:'smooth'});
 	});
 
+	// doors
 	const bump=n=>{ const d=day(); d.doors=Math.max(0,(d.doors||0)+n);
 		const v=$('#dVal'); if(v) v.textContent=d.doors;
 		const t=document.querySelector('#tally .tal:nth-child(2) b'); if(t) t.textContent=d.doors;
@@ -453,6 +587,7 @@ function wire(){
 	on('#dPlus','click',()=>bump(1));
 	on('#dMinus','click',()=>bump(-1));
 
+	// sale
 	on('#sProd','change',e=>{ const p=PREM[e.target.value]; if(p) $('#sPrem').value=p; });
 	on('#sAdd','click',()=>{
 		const c=$('#sCust').value.trim();
@@ -461,11 +596,57 @@ function wire(){
 		save(); toast('Sale logged'); render();
 	});
 
+	// delete
 	all('.delLead','click',e=>{ const d=day();
 		d.leads=d.leads.filter(l=>l.id!==e.currentTarget.dataset.id); save(); toast('Removed'); render(); });
 	all('.delSale','click',e=>{ const d=day();
 		d.sales=d.sales.filter(s=>s.id!==e.currentTarget.dataset.id); save(); toast('Removed'); render(); });
 
+	on('#openHistoryBtn','click',()=>{
+		const past = Object.keys(S.data).filter(k=>k!==today()&&(S.data[k].leads.length||S.data[k].sales.length)).sort().reverse();
+		if(past.length){
+			S.historyDate = past[0];
+			S.screen = 'history';
+			render();
+		}
+	});
+
+	all('.openHistoryDate','click',e=>{
+		const selectedDate = e.currentTarget.dataset.d;
+		if (selectedDate !== today()) {
+			S.historyDate = selectedDate;
+			S.screen = 'history';
+			render();
+		}
+	});
+
+	on('#histBack','click',()=>{ S.screen='day'; render(); });
+	
+	on('#hCopy','click',()=>{
+		if(S.historyDate) doCopy(buildText(S.historyDate));
+	});
+
+	on('#hShare','click',async()=>{
+		if(!S.historyDate) return;
+		const t=buildText(S.historyDate);
+		if(navigator.share){
+			try{ await navigator.share({text:t}); return; }catch(_){ }
+		}
+		window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+	});
+
+	on('#hDelete','click',()=>{
+		if(!S.historyDate) return;
+		if(confirm(`Delete all records logged for ${pretty(S.historyDate)}?`)){
+			delete S.data[S.historyDate];
+			save();
+			toast('History entry deleted');
+			S.screen='day';
+			render();
+		}
+	});
+
+	// send
 	all('.resend','click',e=>{ S.sendDate=e.currentTarget.dataset.d; S.screen='send'; render(); });
 	on('#backToday','click',()=>{ S.sendDate=null; render(); });
 	on('#copy','click',()=>doCopy(buildText(S.sendDate||today())));
@@ -502,3 +683,5 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+</body>
+</html>
