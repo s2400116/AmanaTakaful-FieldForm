@@ -145,7 +145,7 @@ const PRODUCTS=['Motor Third Party','Motor Comprehensive','Renters / My Home','T
 const PREM={'Motor Third Party':175,'Motor Comprehensive':890,'Renters / My Home':200,'Travel Takaful':300,
  'Hajj & Umrah':359,'Takaful Business Cover':700,'Expatriate Takaful':1000,'Odi Booster':1500};
 const OUTCOME=[{id:'int',n:'Interested'},{id:'cb',n:'Call back'},{id:'no',n:'Not interested'}];
-const TARGET=4;
+const TARGET=15;
 const ROSTER=['Mohamed Jaish Junaid','Khadheeja Saara Mohamed','Aishath Shayan Waseem','Mohamed Aydin Moosa Khaleel','Aishath Aala Ibrahim','Ahmed Dhaavoodhu Ali'];
 
 const K={me:'aff_me',data:'aff_data'};
@@ -255,11 +255,13 @@ function render(){
 		: `Field form<small>Set up your name first</small>`;
 
 	const zn=ZONES.find(z=>z.id===d.zone);
+	const phoneCount = d.leads.filter(l=>l.phone && l.phone.trim()).length;
+
 	$('#tally').innerHTML = S.me.name ? [
-		['leads',d.leads.length+' / '+TARGET,'Leads today',d.leads.length>=TARGET],
-		['doors',d.doors,'Doors',false],
-		['sales',d.sales.length,'Sold',false],
-		['zone',d.place?d.place:(zn?zn.id:'—'),d.place?'Location':'Zone',false]
+		['phone', phoneCount + ' / ' + TARGET, 'Phone Numbers', phoneCount >= TARGET],
+		['doors', d.doors, 'Doors', false],
+		['sales', d.sales.length, 'Sold', false],
+		['zone', d.place ? d.place : (zn ? zn.id : '—'), d.place ? 'Location' : 'Zone', false]
 	].map(t=>`<div class="tal ${t[3]?'hit':''}"><b>${esc(t[1])}</b><span>${t[2]}</span></div>`).join('') : '';
 
 	document.querySelectorAll('nav button[data-s]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.s===S.screen && S.screen!=='history')));
@@ -384,7 +386,7 @@ function scDay(){
 			${hasPastDays ? `<button class="btn sm" id="openHistoryBtn">History</button>` : ''}
 		</div>
 	</div>
-	${d.sales.length?`<div class="card">数<h2>Sold today</h2><div class="hint">Nice work.</div>
+	${d.sales.length?`<div class="card"><h2>Sold today</h2><div class="hint">Nice work.</div>
 		${d.sales.map(s=>`<div class="item"><div class="n">${esc(s.customer)}</div>
 			<div class="m">${esc(s.product)} · MVR ${Number(s.premium||0).toLocaleString()}</div>
 			<div class="b"><span></span><button class="del delSale" data-id="${s.id}">Remove</button></div></div>`).join('')}
@@ -475,9 +477,9 @@ function scSend(){
 	${has?`<div class="card"><h2>What will be sent</h2><div class="hint">Check the names and numbers are right.</div>
 		<pre class="out">${esc(txt)}</pre></div>`:''}
 	${S.sendDate&&S.sendDate!==today()?`<button class="btn" id="backToday">Back to today</button>`:''}
-	<div class="note info" style="margin-top:13pxflex:1justify-content:center;align-items:center;text-align:center">
+	<div class="note info" style="margin-top:13px;display:flex;justify-content:center;align-items:center;text-align:center">
     	Be sure to send your supervisor the list before clocking out..
-  	</div>`
+  	</div>`;
 }
 
 function buildText(dt){
@@ -573,6 +575,7 @@ function wire(){
 		const d=day();
 		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),product:S.draft.product,
 			outcome:S.draft.outcome,place:$('#lPlace').value.trim(),note:$('#lNote').value.trim(),ts:Date.now()});
+		d.doors = (d.doors || 0) + 1;
 		S.draft={product:'',outcome:'int'};
 		save();
 		toast(`Added — ${d.leads.length} today`);
@@ -592,7 +595,9 @@ function wire(){
 	on('#sAdd','click',()=>{
 		const c=$('#sCust').value.trim();
 		if(!c){ toast('Add the customer name'); $('#sCust').focus(); return; }
-		day().sales.push({id:uid(),customer:c,product:$('#sProd').value,premium:+$('#sPrem').value||0,ts:Date.now()});
+		const d=day();
+		d.sales.push({id:uid(),customer:c,product:$('#sProd').value,premium:+$('#sPrem').value||0,ts:Date.now()});
+		d.doors = (d.doors || 0) + 1;
 		save(); toast('Sale logged'); render();
 	});
 
@@ -678,7 +683,7 @@ if ('serviceWorker' in navigator) {
       });
     `;
     const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
+    const swUrl = CreateObjectURL(blob);
     navigator.serviceWorker.register(swUrl).catch(() => {});
   });
 }
