@@ -63,7 +63,8 @@ textarea{resize:vertical;line-height:1.55}
 .chip.z[aria-pressed="true"]{background:var(--teal);border-color:var(--teal)}
 .chip.o[aria-pressed="true"]{background:var(--green);border-color:var(--green)}
 .chip.o.cb[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#3A2600}
-.chip.o.no[aria-pressed="true"]{background:var(--mid);border-color:var(--mid)}
+.chip.o.no[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.chip.o.nr[aria-pressed="true"]{background:var(--mid);border-color:var(--mid);color:#fff}
 
 .btn{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:13px;font-size:15px;font-weight:600}
 .btn.p{background:var(--navy);border-color:var(--navy);color:#fff}
@@ -86,7 +87,8 @@ textarea{resize:vertical;line-height:1.55}
 .tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
 .tag.int{background:var(--green-l);color:var(--green)}
 .tag.cb{background:var(--gold-l);color:var(--gold-d)}
-.tag.no{background:var(--line-s);color:var(--mid)}
+.tag.no{background:var(--red-l);color:var(--red)}
+.tag.nr{background:var(--line-s);color:var(--mid)}
 .del{background:none;border:0;color:var(--red);font-size:13px;font-weight:500;padding:4px}
 
 .empty{text-align:center;padding:36px 14px;color:var(--mid);font-size:14px}
@@ -144,13 +146,12 @@ const PRODUCTS=['Motor Third Party','Motor Comprehensive','Renters / My Home','T
  'Hajj & Umrah','Takaful Business Cover','Expatriate Takaful','Odi Booster','Health Takaful','Other'];
 const PREM={'Motor Third Party':175,'Motor Comprehensive':890,'Renters / My Home':200,'Travel Takaful':300,
  'Hajj & Umrah':359,'Takaful Business Cover':700,'Expatriate Takaful':1000,'Odi Booster':1500};
-const OUTCOME=[{id:'int',n:'Interested'},{id:'cb',n:'Call back'},{id:'no',n:'Not interested'}];
+const OUTCOME=[{id:'int',n:'Interested'},{id:'cb',n:'Call back'},{id:'no',n:'Not interested'},{id:'nr',n:'No Response'}];
 const TARGET=15;
 const ROSTER=['Mohamed Jaish Junaid','Khadheeja Saara Mohamed','Aishath Shayan Waseem','Mohamed Aydin Moosa Khaleel','Aishath Aala Ibrahim','Ahmed Dhaavoodhu Ali'];
 
 const K={me:'aff_me',data:'aff_data'};
-let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',historyDate:null,ready:false,dirty:false,
-			 draft:{product:'',outcome:'int'}};
+let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',historyDate:null,ready:false,dirty:false,draft:{products:[],outcome:'int'}};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -335,8 +336,8 @@ function scAdd(){
 		</label>
 		<label class="f"><span>Mobile number</span>
 			<input type="tel" id="lPhone" inputmode="numeric" placeholder="7XXXXXX" autocomplete="off"></label>
-		<label class="f"><span>What were they interested in?</span>
-			<div class="chips">${PRODUCTS.map(p=>`<button class="chip pBtn" data-v="${esc(p)}" aria-pressed="${S.draft.product===p}">${esc(p)}</button>`).join('')}</div></label>
+		<label class="f"><span>What were they interested in? <span style="font-weight:400;color:var(--faint)">— select multiple</span></span>
+			<div class="chips">${PRODUCTS.map(p=>`<button class="chip pBtn" data-v="${esc(p)}" aria-pressed="${(S.draft.products||[]).includes(p)}">${esc(p)}</button>`).join('')}</div></label>
 		<label class="f"><span>How did it go?</span>
 			<div class="chips">${OUTCOME.map(o=>`<button class="chip o ${o.id} oBtn" data-v="${o.id}" aria-pressed="${S.draft.outcome===o.id}">${o.n}</button>`).join('')}</div></label>
 		<label class="f"><span>Where did you meet them? <span style="font-weight:400;color:var(--faint)">— leave blank to use ${esc(locLabel)}</span></span>
@@ -563,8 +564,16 @@ function wire(){
 
 	// zone + draft chips
 	all('.zBtn','click',e=>{ const d=day(); d.zone=e.currentTarget.dataset.v; S.me.zone=d.zone; save(); render(); });
-	all('.pBtn','click',e=>{ S.draft.product=e.currentTarget.dataset.v;
-		document.querySelectorAll('.pBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.product))); });
+	all('.pBtn','click',e=>{
+		const v=e.currentTarget.dataset.v;
+		if(!Array.isArray(S.draft.products)) S.draft.products=[];
+		if(S.draft.products.includes(v)){
+			S.draft.products=S.draft.products.filter(x=>x!==v);
+		} else {
+			S.draft.products.push(v);
+		}
+		e.currentTarget.setAttribute('aria-pressed',String(S.draft.products.includes(v)));
+	});
 	all('.oBtn','click',e=>{ S.draft.outcome=e.currentTarget.dataset.v;
 		document.querySelectorAll('.oBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.outcome))); });
 
@@ -573,10 +582,11 @@ function wire(){
 		const name=$('#lName').value.trim();
 		if(!name){ toast('Add a name'); $('#lName').focus(); return; }
 		const d=day();
-		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),product:S.draft.product,
+		const productList = (S.draft.products || []).join(' / ');
+		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),product:productList,
 			outcome:S.draft.outcome,place:$('#lPlace').value.trim(),note:$('#lNote').value.trim(),ts:Date.now()});
 		d.doors = (d.doors || 0) + 1;
-		S.draft={product:'',outcome:'int'};
+		S.draft={products:[],outcome:'int'};
 		save();
 		toast(`Added — ${d.leads.length} today`);
 		render(); window.scrollTo({top:0,behavior:'smooth'});
@@ -683,7 +693,7 @@ if ('serviceWorker' in navigator) {
       });
     `;
     const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = CreateObjectURL(blob);
+    const swUrl = URL.createObjectURL(blob);
     navigator.serviceWorker.register(swUrl).catch(() => {});
   });
 }
