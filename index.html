@@ -393,11 +393,15 @@ function scDay(){
 			<div class="b"><span></span><button class="del delSale" data-id="${s.id}">Remove</button></div></div>`).join('')}
 	</div>`:''}
 	${d.leads.length? `<div class="card"><h2>People you spoke to</h2><div class="hint">Newest first.</div>
-		${d.leads.slice().reverse().map(l=>`<div class="item">
-			<div class="n">${esc(l.name)}</div>
-			<div class="m">${esc(l.phone||'no number')}${l.product?' · '+esc(l.product):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
-			<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span>
-				<button class="del delLead" data-id="${l.id}">Remove</button></div></div>`).join('')}
+		${d.leads.slice().reverse().map(l=>{
+			const prods = Array.isArray(l.products) ? l.products : (l.product ? l.product.split(' / ') : []);
+			const prodStr = prods.join(' / ');
+			return `<div class="item">
+				<div class="n">${esc(l.name)}</div>
+				<div class="m">${esc(l.phone||'no number')}${prodStr?' · '+esc(prodStr):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
+				<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span>
+					<button class="del delLead" data-id="${l.id}">Remove</button></div></div>`;
+		}).join('')}
 	</div>`
 	: `<div class="empty"><b>Nothing logged yet today</b>Tap “Add lead” at the bottom after your first conversation.</div>`}
 	${prevDays()}`;
@@ -449,11 +453,15 @@ function scHistory(){
 	</div>
 
 	${d.leads.length ? `<div class="card"><h2>Leads Logged</h2>
-		${d.leads.slice().reverse().map(l=>`<div class="item">
-			<div class="n">${esc(l.name)}</div>
-			<div class="m">${esc(l.phone||'no number')}${l.product?' · '+esc(l.product):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
-			<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span></div>
-		</div>`).join('')}
+		${d.leads.slice().reverse().map(l=>{
+			const prods = Array.isArray(l.products) ? l.products : (l.product ? l.product.split(' / ') : []);
+			const prodStr = prods.join(' / ');
+			return `<div class="item">
+				<div class="n">${esc(l.name)}</div>
+				<div class="m">${esc(l.phone||'no number')}${prodStr?' · '+esc(prodStr):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
+				<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span></div>
+			</div>`;
+		}).join('')}
 	</div>` : ''}
 
 	<div class="card">
@@ -483,6 +491,18 @@ function scSend(){
   	</div>`;
 }
 
+function formatExtraProductsMsg(products){
+	if(!products || products.length <= 1) return '';
+	const extras = products.slice(1).map(p => `'${p}'`);
+	let listStr = '';
+	if(extras.length === 1){
+		listStr = extras[0];
+	} else {
+		listStr = extras.slice(0, -1).join(', ') + ' & ' + extras[extras.length - 1];
+	}
+	return `Showed Interest in ${listStr}.`;
+}
+
 function buildText(dt){
 	const d=S.data[dt]; if(!d) return '';
 	const pts=getPartners(d);
@@ -496,9 +516,15 @@ function buildText(dt){
 	if(d.place) L.push(`Location: ${d.place}`);
 	L.push('');
 	d.leads.forEach(l=>{
-		const where=(l.place&&l.place!==d.place)?('@ '+l.place):'';
-		const note=[where,l.note,OUTCOME.find(o=>o.id===l.outcome)?.n].filter(Boolean).join(' — ');
-		L.push([l.name,l.phone,l.product,note].filter(Boolean).join(', '));
+		const prods = Array.isArray(l.products) ? l.products : (l.product ? l.product.split(' / ') : []);
+		const primaryProduct = prods[0] || '';
+		const extraMsg = formatExtraProductsMsg(prods);
+
+		const where = (l.place && l.place !== d.place) ? ('@ ' + l.place) : '';
+		const fullNote = [extraMsg, l.note].filter(Boolean).join(' ');
+		const noteAndOutcome = [where, fullNote, OUTCOME.find(o=>o.id===l.outcome)?.n].filter(Boolean).join(' — ');
+
+		L.push([l.name, l.phone, primaryProduct, noteAndOutcome].filter(Boolean).join(', '));
 	});
 	if(!d.leads.length) L.push('(no leads today)');
 	L.push('');
@@ -582,8 +608,8 @@ function wire(){
 		const name=$('#lName').value.trim();
 		if(!name){ toast('Add a name'); $('#lName').focus(); return; }
 		const d=day();
-		const productList = (S.draft.products || []).join(' / ');
-		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),product:productList,
+		const prods = Array.isArray(S.draft.products) ? [...S.draft.products] : [];
+		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),products:prods,product:prods.join(' / '),
 			outcome:S.draft.outcome,place:$('#lPlace').value.trim(),note:$('#lNote').value.trim(),ts:Date.now()});
 		d.doors = (d.doors || 0) + 1;
 		S.draft={products:[],outcome:'int'};
