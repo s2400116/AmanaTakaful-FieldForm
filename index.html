@@ -186,6 +186,17 @@ function recentNames(){
 	});
 	return seen.slice(0,6);
 }
+function recentNotes(){
+	const seen=[];
+	Object.keys(S.data).sort().reverse().forEach(k=>{
+		const leads=S.data[k].leads||[];
+		leads.slice().reverse().forEach(l=>{
+			const n=(l.note||'').trim();
+			if(n && !seen.includes(n)) seen.push(n);
+		});
+	});
+	return seen.slice(0,6);
+}
 function roster(){ return (S.me.roster||[]).filter(Boolean); }
 function others(){ return roster().filter(n=>n!==S.me.name); }
 function parseRoster(txt){
@@ -343,7 +354,10 @@ function scAdd(){
 		<label class="f"><span>Where did you meet them? <span style="font-weight:400;color:var(--faint)">— leave blank to use ${esc(locLabel)}</span></span>
 			<input type="text" id="lPlace" placeholder="Only if it was somewhere else" autocomplete="off"></label>
 		<label class="f"><span>Note (optional)</span>
-			<input type="text" id="lNote" placeholder="e.g. call after 5"></label>
+			<input type="text" id="lNote" placeholder="e.g. call after 5" autocomplete="off">
+			${recentNotes().length?`<div class="chips" style="margin-top:9px">${recentNotes().map(n=>
+				`<button class="chip lNoteBtn" data-v="${esc(n)}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>`:''}
+		</label>
 		<button class="btn p" id="lAdd">Add to today's list</button>
 	</div>
 
@@ -580,6 +594,11 @@ function wire(){
 	all('.lNameBtn','click',e=>{
 		const v=e.currentTarget.dataset.v;
 		const el=$('#lName');
+		if(el) el.value=v;
+	});
+	all('.lNoteBtn','click',e=>{
+		const v=e.currentTarget.dataset.v;
+		const el=$('#lNote');
 		if(el) el.value=v;
 	});
 	on('#wipe','click',()=>{
