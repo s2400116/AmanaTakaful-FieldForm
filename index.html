@@ -175,13 +175,13 @@ function recentPlaces(){
 	});
 	return seen.slice(0,6);
 }
-function recentNames(){
+function recentHouses(){
 	const seen=[];
 	Object.keys(S.data).sort().reverse().forEach(k=>{
 		const leads=S.data[k].leads||[];
 		leads.slice().reverse().forEach(l=>{
-			const n=(l.name||'').trim();
-			if(n && !seen.includes(n)) seen.push(n);
+			const h=(l.house || l.name || '').trim();
+			if(h && !seen.includes(h)) seen.push(h);
 		});
 	});
 	return seen.slice(0,6);
@@ -329,7 +329,7 @@ function scAdd(){
 					+`<button class="chip ptBtn" data-v="" aria-pressed="${pts.length===0}">On my own</button>`
 				: '<span style="font-size:13px;color:var(--mid)">Add the team list in settings first.</span>'}</div></label>
 		<label class="f"><span>Zone</span>
-			<div class="chips">${ZONES.map(z=>`<button class="chip z zBtn" data-v="${z.id}" aria-pressed="${d.zone===z.id}">${z.id} ${esc(z.n)}</button>`).join('')}</div></label>
+			<div class="chips">${ZONES.map(z=>`<button class="chip z zBtn" data-v="${z.id}" aria-pressed="${d.zone===z.id}">${z.id}${esc(z.n)}</button>`).join('')}</div></label>
 		<label class="f" style="margin:0"><span>Exactly where are you? <span style="font-weight:400;color:var(--faint)">— type it yourself</span></span>
 			<input type="text" id="plIn" value="${esc(d.place||'')}" placeholder="e.g. Vinares Tower 3 lobby" autocomplete="off">
 			${recentPlaces().length?`<div class="chips" style="margin-top:9px">${recentPlaces().map(p=>
@@ -339,16 +339,19 @@ function scAdd(){
 
 	<div class="card">
 		<h2>Add someone you spoke to</h2>
-		<div class="hint">Name and number are the ones that matter.</div>
-		<label class="f"><span>Name</span>
-			<input type="text" id="lName" placeholder="Customer name or house name" autocomplete="off">
-			${recentNames().length?`<div class="chips" style="margin-top:9px">${recentNames().map(n=>
-				`<button class="chip lNameBtn" data-v="${esc(n)}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>`:''}
+		<div class="hint">House name and number are the ones that matter.</div>
+		<label class="f"><span>House Name</span>
+			<input type="text" id="lHouse" placeholder="House name" autocomplete="off">
+			${recentHouses().length?`<div class="chips" style="margin-top:9px">${recentHouses().map(h=>
+				`<button class="chip lHouseBtn" data-v="${esc(h)}" aria-pressed="false">${esc(h)}</button>`).join('')}</div>`:''}
+		</label>
+		<label class="f" id="custWrap" style="display:none"><span>Customer Name</span>
+			<input type="text" id="lCustomer" placeholder="Customer name" autocomplete="off">
 		</label>
 		<label class="f"><span>Mobile number</span>
 			<input type="tel" id="lPhone" inputmode="numeric" placeholder="7XXXXXX" autocomplete="off"></label>
 		<label class="f"><span>What were they interested in? <span style="font-weight:400;color:var(--faint)">— select multiple</span></span>
-			<div class="chips">${PRODUCTS.map(p=>`<button class="chip pBtn" data-v="${esc(p)}" aria-pressed="${(S.draft.products||[]).includes(p)}">${esc(p)}</button>`).join('')}</div></label>
+			<div class="chips">${PRODUCTS.map(p=>`<button class="chip pBtn" data-v="${esc(p)}" aria-pressed="${(Array.isArray(S.draft.products) ? S.draft.products : []).includes(p)}">${esc(p)}</button>`).join('')}</div></label>
 		<label class="f"><span>How did it go?</span>
 			<div class="chips">${OUTCOME.map(o=>`<button class="chip o ${o.id} oBtn" data-v="${o.id}" aria-pressed="${S.draft.outcome===o.id}">${o.n}</button>`).join('')}</div></label>
 		<label class="f"><span>Where did you meet them? <span style="font-weight:400;color:var(--faint)">— leave blank to use ${esc(locLabel)}</span></span>
@@ -410,8 +413,10 @@ function scDay(){
 		${d.leads.slice().reverse().map(l=>{
 			const prods = Array.isArray(l.products) ? l.products : (l.product ? l.product.split(' / ') : []);
 			const prodStr = prods.join(' / ');
+			const houseName = l.house || l.name || '';
+			const nameDisplay = houseName + (l.customerName ? ` (${l.customerName})` : '');
 			return `<div class="item">
-				<div class="n">${esc(l.name)}</div>
+				<div class="n">${esc(nameDisplay)}</div>
 				<div class="m">${esc(l.phone||'no number')}${prodStr?' · '+esc(prodStr):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
 				<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span>
 					<button class="del delLead" data-id="${l.id}">Remove</button></div></div>`;
@@ -470,8 +475,10 @@ function scHistory(){
 		${d.leads.slice().reverse().map(l=>{
 			const prods = Array.isArray(l.products) ? l.products : (l.product ? l.product.split(' / ') : []);
 			const prodStr = prods.join(' / ');
+			const houseName = l.house || l.name || '';
+			const nameDisplay = houseName + (l.customerName ? ` (${l.customerName})` : '');
 			return `<div class="item">
-				<div class="n">${esc(l.name)}</div>
+				<div class="n">${esc(nameDisplay)}</div>
 				<div class="m">${esc(l.phone||'no number')}${prodStr?' · '+esc(prodStr):''}${l.place?' · '+esc(l.place):''}${l.note?' · '+esc(l.note):''}</div>
 				<div class="b"><span class="tag ${l.outcome}">${OUTCOME.find(o=>o.id===l.outcome)?.n||''}</span></div>
 			</div>`;
@@ -538,7 +545,11 @@ function buildText(dt){
 		const fullNote = [extraMsg, l.note].filter(Boolean).join(' ');
 		const noteAndOutcome = [where, fullNote, OUTCOME.find(o=>o.id===l.outcome)?.n].filter(Boolean).join(' — ');
 
-		L.push([l.name, l.phone, primaryProduct, noteAndOutcome].filter(Boolean).join(', '));
+		const houseStr = l.house || l.name || '';
+		const custStr = l.customerName ? `(${l.customerName})` : '';
+		const phoneCustStr = l.phone ? `${l.phone}${custStr ? ' ' + custStr : ''}` : custStr;
+
+		L.push([houseStr, phoneCustStr, primaryProduct, noteAndOutcome].filter(Boolean).join(', '));
 	});
 	if(!d.leads.length) L.push('(no leads today)');
 	L.push('');
@@ -591,9 +602,9 @@ function wire(){
 		day().place = (day().place===v) ? '' : v;
 		save(); render();
 	});
-	all('.lNameBtn','click',e=>{
+	all('.lHouseBtn','click',e=>{
 		const v=e.currentTarget.dataset.v;
-		const el=$('#lName');
+		const el=$('#lHouse');
 		if(el) el.value=v;
 	});
 	all('.lNoteBtn','click',e=>{
@@ -622,13 +633,25 @@ function wire(){
 	all('.oBtn','click',e=>{ S.draft.outcome=e.currentTarget.dataset.v;
 		document.querySelectorAll('.oBtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.draft.outcome))); });
 
+	const phoneEl=$('#lPhone');
+	if(phoneEl){
+		phoneEl.addEventListener('input',e=>{
+			const custWrap=$('#custWrap');
+			if(custWrap){
+				custWrap.style.display=e.target.value.trim().length>0?'block':'none';
+			}
+		});
+	}
+
 	// add lead
 	on('#lAdd','click',()=>{
-		const name=$('#lName').value.trim();
-		if(!name){ toast('Add a name'); $('#lName').focus(); return; }
+		const house=$('#lHouse').value.trim();
+		if(!house){ toast('Add a house name'); $('#lHouse').focus(); return; }
+		const customerName=$('#lCustomer')?$('#lCustomer').value.trim():'';
+		const phone=$('#lPhone').value.trim();
 		const d=day();
 		const prods = Array.isArray(S.draft.products) ? [...S.draft.products] : [];
-		d.leads.push({id:uid(),name,phone:$('#lPhone').value.trim(),products:prods,product:prods.join(' / '),
+		d.leads.push({id:uid(),house,name:house,customerName,phone,products:prods,product:prods.join(' / '),
 			outcome:S.draft.outcome,place:$('#lPlace').value.trim(),note:$('#lNote').value.trim(),ts:Date.now()});
 		d.doors = (d.doors || 0) + 1;
 		S.draft={products:[],outcome:'int'};
