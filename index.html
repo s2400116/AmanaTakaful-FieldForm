@@ -143,15 +143,16 @@ const ZONES=[
  {id:'Z3',n:'Leisure & Beach'},{id:'Z4',n:'Phase 1/2 Border'},
  {id:'Z5',n:'Hiyaa Precinct'},{id:'Z6',n:'Institutional'}];
 const PRODUCTS=['Motor Third Party','Motor Comprehensive','Renters / My Home','Travel Takaful',
- 'Hajj & Umrah','Takaful Business Cover','Expatriate Takaful','Odi Booster','Health Takaful','Other'];
+ 'Hajj & Umrah','Takaful Business Cover','Expatriate Takaful','Odi Booster','Health Takaful', 'Fire Takaful','Other'];
 const PREM={'Motor Third Party':175,'Motor Comprehensive':890,'Renters / My Home':200,'Travel Takaful':300,
  'Hajj & Umrah':359,'Takaful Business Cover':700,'Expatriate Takaful':1000,'Odi Booster':1500};
 const OUTCOME=[{id:'int',n:'Interested'},{id:'cb',n:'Call back'},{id:'no',n:'Not interested'},{id:'nr',n:'No Response'}];
-const TARGET=5;
+const TARGET=30;
 const ROSTER=['Mohamed Jaish Junaid','Khadheeja Saara Mohamed','Aishath Shayan Waseem','Mohamed Aydin Moosa Khaleel','Aishath Aala Ibrahim','Ahmed Dhaavoodhu Ali'];
+const PLACE='Shop';
 
 const K={me:'aff_me',data:'aff_data'};
-let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',historyDate:null,ready:false,dirty:false,draft:{products:[],outcome:'int'}};
+let S={me:{name:'',zone:'Z5',roster:[]},data:{},screen:'add',historyDate:null,ready:false,dirty:false,draft:{products:[],outcome:'nr'}};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -271,7 +272,7 @@ function render(){
 
 	$('#tally').innerHTML = S.me.name ? [
 		['phone', phoneCount + ' / ' + TARGET, 'Phone Numbers', phoneCount >= TARGET],
-		['doors', d.doors, 'Doors', false],
+		['doors', d.doors, `${PLACE}s`, false],
 		['sales', d.sales.length, 'Sold', false],
 		['zone', d.place ? d.place : (zn ? zn.id : '—'), d.place ? 'Location' : 'Zone', false]
 	].map(t=>`<div class="tal ${t[3]?'hit':''}"><b>${esc(t[1])}</b><span>${t[2]}</span></div>`).join('') : '';
@@ -339,9 +340,9 @@ function scAdd(){
 
 	<div class="card">
 		<h2>Add someone you spoke to</h2>
-		<div class="hint">House name and number are the ones that matter.</div>
-		<label class="f"><span>House Name</span>
-			<input type="text" id="lHouse" placeholder="House name" autocomplete="off">
+		<div class="hint">${PLACE} name and number are the ones that matter.</div>
+		<label class="f"><span>${PLACE} Name</span>
+			<input type="text" id="lHouse" placeholder="${PLACE} name" autocomplete="off">
 			${recentHouses().length?`<div class="chips" style="margin-top:9px">${recentHouses().map(h=>
 				`<button class="chip lHouseBtn" data-v="${esc(h)}" aria-pressed="false">${esc(h)}</button>`).join('')}</div>`:''}
 		</label>
@@ -553,7 +554,7 @@ function buildText(dt){
 	});
 	if(!d.leads.length) L.push('(no leads today)');
 	L.push('');
-	L.push(`Doors knocked: ${d.doors}`);
+	L.push(`${PLACE}s visited: ${d.doors}`);
 	d.sales.forEach(s=>L.push(`Policy sold: ${s.customer} — ${s.product} — MVR ${s.premium}`));
 	return L.join('\n');
 }
